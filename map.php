@@ -1,7 +1,6 @@
 <?php
   $domain = '/GoogleMapsAPI/';
   error_reporting(0); 
-  $mtype = $_GET["mtype"];
   if(!isset($mtype)) $mtype = '';
 ?>
 
@@ -16,26 +15,24 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo $domain;?>css/style.css">
 	<!-- /MyStyles -->
 
-  <!-- PreSet MAPs -->
-  <script type="text/javascript">
-    var mtype = '<?php echo $mtype; ?>';
-  </script>
-  <!-- /PreSet MAPs -->
-
   <!-- jQuery -->
   <script type="text/javascript" src='<?php echo $domain;?>js/jq.min.js'></script>
   <!-- /jQuery -->
 
-    <!-- GoogleScripts -->
-    <script type="text/javascript"
-      src="http://maps.googleapis.com/maps/api/js?sensor=true&v=3.exp&libraries=places">
-    </script>
-    <!-- /GoogleScripts -->
+  <!-- GoogleScripts -->
+  <script type="text/javascript"
+    src="http://maps.googleapis.com/maps/api/js?sensor=true&v=3.exp&libraries=places">
+  </script>
+  <!-- /GoogleScripts -->
 
-    <script type="text/javascript">
-		// Create the position
-		var current_position = new google.maps.LatLng(-15.867580, -48.030132); //Put here whatever came from the SMS
-    </script>
+  <!-- PreSet MAPs -->
+  <script type="text/javascript">
+    var mtype = '<?php echo $mtype; ?>';
+    // Create the position
+    var user_location = new google.maps.LatLng(<?php echo $latitude; ?>, <?php echo $longitude; ?>); //Put here whatever came from the SMS
+    var domain_url = <?php echo $domain; ?>;
+  </script>
+  <!-- /PreSet MAPs -->
 
 	<!-- FrameworksScripts -->
 	<!-- /FrameworksScripts -->
