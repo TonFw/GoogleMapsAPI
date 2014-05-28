@@ -1,0 +1,83 @@
+/*
+FQL pegar os eventos de reveillon
+SELECT eid, name, pic, venue FROM event 
+WHERE contains('Réveillon') AND 
+      strpos(name, 'Réveillon') >= 0
+ */
+
+/*
+FQL pega a cidade
+SELECT categories, location
+FROM page 
+WHERE contains('Recife') AND 
+strpos(name, 'Recife') >=0
+ */
+
+/*
+//$fql = "SELECT page_id, name, location, fan_count, talking_about_count, were_here_count, categories FROM page WHERE contains('Recife') AND strpos(name, 'Recife') >=0";
+$fql = "SELECT eid, name, pic, description FROM event WHERE contains('Réveillon') AND strpos(name, 'Réveillon') >= 0";
+$fql_retorno = $ton_fb->fb_query($fql);
+
+$cidades = array();
+echo 'Quantidade de registros: ' . sizeof($fql_retorno) . '<br><br><br>';
+print_r($fql_retorno);die;
+foreach ($fql_retorno as $retorno) {
+    //print_r($retorno);
+    echo $retorno['id'] . ' - ' . $retorno['name'] . '<br>'; 
+    echo $retorno['categories'][0]['name'];
+    echo '<br><br>';
+    
+    if($retorno['categories']['name'] == 'City') print_r($retorno);
+    else echo '<br><br>';
+}
+
+print_r($fql_retorno);
+
+die;
+*/
+
+/*
+// $fql_top10 = 'SELECT uid, name, mutual_friend_count from user where uid in (SELECT uid2 FROM friend WHERE uid1=me()) ORDER BY mutual_friend_count desc LIMIT 10'
+$fql_amigosOrdenadosNumCoxoes = 'SELECT uid, name, mutual_friend_count from user where uid in (SELECT uid2 FROM friend WHERE uid1=me()) ORDER BY mutual_friend_count desc';
+$amigos_ordenados = $ton_fb->fb_query($fql_amigosOrdenadosNumCoxoes);
+
+$array_eventos = array();
+$ton_fb->getEventosAmigos($amigos_ordenados);
+die;
+
+$eventos = $ton_fb->facebook->api('/'. $amigos_ordenados[4]['uid'] .'/events');
+$primeiro_evento = $eventos['data'][0];
+TonLibFB::getFotoPerfil($primeiro_evento, TonLibInterface::FB_TIPO_EVENTO, true);
+//print_r($primeiro_evento);
+die('<br><br> oi');
+
+/*
+foreach ($amigos_ordenados as $amigo) {
+    echo 'Nome: ' . $amigo['name'] . '<br>';
+    $evento_corrente = $ton_fb->facebook->api('/'. $amigo['uid'] .'/events');
+    if(!empty($evento_corrente['data'])) print_r ($evento_corrente); //array_push($array_eventos, $evento_corrente);
+}
+
+print_r($amigos_ordenados);
+ */
+/*
+foreach ($amigos_ordenados as $value) {
+    
+}
+$evento1 = $ton_fb->facebook->api('/'. $amigos_ordenados[45]['uid'] .'/events');
+print_r($evento1);
+die;
+ */
+/*
+foreach ($amigos_ordenados as $amigo) {
+    $evento_corrente = $ton_fb->facebook->api('/'. $amigo['uid'] .'/events');
+    if(!empty($evento_corrente['data'])) array_push($array_eventos, $evento_corrente);
+}
+
+print_r($array_eventos);
+*/
+/*
+foreach ($array_eventos as $evento) {
+    echo '<img src="https://graph.facebook.com/'. $evento[id] .'/picture"><br><br>';
+}
+*/
