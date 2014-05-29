@@ -1,102 +1,111 @@
-var infowindow;
 var map;
+var infowindow;
+var global_police_place_details = [];
+var global_hospital_place_details = [];
 
-//This is the code to initialize and center the map on the Welty House, as well as to add the icons
-//for the search
 function initialize() {
+  var pyrmont = current_position;
 
-  // Options the SetUp the map to be rendered
-  map_options = {
-      center : user_location,
-      zoom : 15,
-      mapTypeId : google.maps.MapTypeId.ROADMAP
-  };
+  map = new google.maps.Map(document.getElementById('map_canvas'), {
+    center: current_position,
+    zoom: 15
+  });
 
-  // Set where (ON THE HTML) to render the map with the options
-  map = new google.maps.Map(document.getElementById("map_canvas"), map_options);
-  iconMe = '';
-  positionMe = '';
-  markedMe = markOn(map, user_location, iconMe, positionMe);
-
-  // Perimeto
-  pyrmont = user_location;
-  var police_request = {
+  var request_police = {
     location: pyrmont,
     radius: 5000,
     types: ['police']
   };
+
   var request_hospital = {
     location: pyrmont,
     radius: 5000,
     types: ['hospital']
   };
 
-  // Search elements
+  var markerMe = new google.maps.Marker({
+      position: current_position,
+      map: map
+  });
+
   infowindow = new google.maps.InfoWindow();
   var service = new google.maps.places.PlacesService(map);
   if(mtype == 'panic') { 
-    service.nearbySearch(request_police, search_place_callback); 
+    service.nearbySearch(request_police, callback_police); 
   }else if(mtype == 'sos') {
-    service.nearbySearch(request_hospital, search_place_callback);
+    service.nearbySearch(request_hospital, callback_hospital);
   }else {
-    service.nearbySearch(request_police, search_place_callback);
-    service.nearbySearch(request_hospital, search_place_callback);
+    service.nearbySearch(request_police, callback_police);
+    service.nearbySearch(request_hospital, callback_hospital);
   }
 }
 
-// map = google.maps.Map
-// at = google.maps.LatLng
-// icon = URL of the image
-function markOn(map, at, icon) {
-  return new google.maps.Marker({
-      position: at,
-      map: map,
-      icon: icon
-  });  
-}
-
-/**
-  * Called when the place search is end.
-  * Mark the places on the result.
-**/
-function search_place_callback(results, status) {
-  console.log(results);
+function callback_police(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
-      var place = results[i];
-      create_place(place);
+      createMarkerPolice(results[i]);
     }
   }
 }
 
-// Create the place with its options
-function create_place(place) {
-  var placeLoc = place.geometry.location;
-      
-  // Mark the place on the map
-  marker = markOn(map, placeLoc, case_icon(place.types[0]));
-
-  // Event click on the map
-  google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent('<strong>Name: </strong>' + place.name + '<br>' + '<strong>Phone: </strong>' + place.formatted_phone_number);
-    infowindow.open(map, this);
-  });
-}
-
-// Switch case the Icon per Type
-function case_icon(type) {
-  switch(type) {
-    case 'police':
-      return domain_url+'images/police.png';
-    break;
-    case 'hospital':
-      return domain_url+'images/hospital.png';
-    break;
-    default:
-      return '';
-    break;
+function callback_hospital(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarkerHospital(results[i]);
+    }
   }
 }
 
-//adding the map to the page after the DOM is loaded
+function createMarkerPolice(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location,
+    icon: domain_url + 'images/police.png'
+  });
+
+  var request = { reference: place.reference };
+  var service = new google.maps.places.PlacesService(map);
+  service.getDetails(request, function(details, status) {
+    global_police_place_details.push(details);
+
+    google.maps.event.addListener(marker, 'click', function() {
+      details = find_current_phone(place.name);
+      infowindow.setContent('<strong>Name: </strong>' + place.name + '<br>' + '<strong>Phone: </strong>' + details.formatted_phone_number);
+      infowindow.open(map, this);
+    });
+  });
+}
+
+function createMarkerHospital(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location,
+    icon: domain_url + 'images/hospital.png'
+  });
+
+  var request = { reference: place.reference };
+  var service = new google.maps.places.PlacesService(map);
+  service.getDetails(request, function(details, status) {
+    global_hospital_place_details.push(details);
+
+    google.maps.event.addListener(marker, 'click', function() {
+      details = find_current_phone(place.name);
+      console.log(global_hospital_place_details);
+      infowindow.setContent('<strong>Name: </strong>' + place.name + '<br>' + '<strong>Phone: </strong>' + details.formatted_phone_number);
+      infowindow.open(map, this);
+    });
+  });
+}
+
+function find_current_phone(place_name) {
+  for(global_place_detail in global_police_place_details){
+    current_detail = global_police_place_details[global_place_detail];
+    if(current_detail != null && current_detail.name == place_name) return current_detail;
+  }
+
+  return {};
+}
+
 google.maps.event.addDomListener(window, 'load', initialize);

@@ -30,6 +30,7 @@
     var mtype = '<?php echo $mtype; ?>';
     // Create the position
     var user_location = new google.maps.LatLng(<?php echo $latitude; ?>, <?php echo $longitude; ?>); //Put here whatever came from the SMS
+    var current_position = new google.maps.LatLng(<?php echo $latitude; ?>, <?php echo $longitude; ?>); //Put here whatever came from the SMS
     var domain_url = <?php echo $domain; ?>;
   </script>
   <!-- /PreSet MAPs -->
